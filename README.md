@@ -65,12 +65,33 @@ avr-objcopy -I binary -O ihex build/program.bin build/program.hex
 
 This is the contents of th output `.hex` file for the [`blinky_test`](blinky_test) program:
 
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43bb30ea-5cfd-4bab-9002-a3bfe7651469)
 
 
 - [Intel HEX File Format](https://microchipdeveloper.com/ipe:sqtp-hex-file-format)
 
 
-This is the contents of the output `.bin` file for the [`blinky_test`](blinky_test) program:
+This is the contents of the output `.bin` file for the [`blinky_test`](blinky_test) program (shown in a Hex Viewer):
+
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/3f6d5e52-2eb7-48e1-b77b-d7f25770e6fb)
+
+The contents of binary file are exactly the bytes that will be programmed
+into the flash memory of the microcontroller (each byte is shown as a 2-digit hexadecimal number).
+
+```
+0C 94 34 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 0C 94 3E 00 0C 94 3E 00
+0C 94 3E 00 0C 94 3E 00 11 24 1F BE CF EF D8 E0
+DE BF CD BF 0E 94 40 00 0C 94 4F 00 0C 94 00 00
+25 9A 90 E2 85 B1 89 27 85 B9 2F EF 31 EE 84 E0
+21 50 30 40 80 40 E1 F7 00 C0 00 00 F3 CF F8 94
+FF CF
+```
+
 
 
 
