@@ -10,11 +10,11 @@ To prepare your build environment first read this tutorial:
 
 **With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the code you want to upload in the bootloader itself.** 
 
-## Project specifications:
+## Project Specifications:
 
 - Compiler: **AVR-GCC**
-- MCU: **ATmega328P** (With 16MHz external crystal)
-- External Programmer: [**FT232H**](https://github.com/m3y54m/cjmcu-ft232hq-programmer) (You may use any other programmer supported by AVRDUDE)
+- MCU: **ATmega328P** (with 16MHz external crystal)
+- External Programmer: [**FT232H**](https://github.com/m3y54m/cjmcu-ft232hq-programmer) (you may use any other programmer supported by AVRDUDE)
 
 ## Looking Deeper at the Blinky Program
 
@@ -48,8 +48,7 @@ avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -o build/main.o -c src/main.c
 avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99  -o build/program.elf build/main.o
 ```
 
-**Sample commands used to generate `.hex` and `.bin` files used for programming the microcontroller:**
-
+**Useful commands used to generate `.hex` and `.bin` files used for programming the microcontroller:**
 
 Generate `.hex` (Intel Hex format) output file from `.elf` file:
 

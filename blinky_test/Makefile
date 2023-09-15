@@ -1,5 +1,4 @@
 SRC_DIR = src
-LIB_DIR = $(SRC_DIR)/my
 BUILD_DIR = build
 
 # The CC variable typically represents the C compiler that will be used during the
