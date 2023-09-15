@@ -294,6 +294,7 @@ With this settings every time the microcontroller resets, it first executes the 
 - [AVR Libc - Memory Sections](https://www.nongnu.org/avr-libc/user-manual/mem_sections.html)
 - [AVR109: Using Self Programming on tinyAVR and megaAVR devices](https://www.microchip.com/en-us/application-notes/an1644)
 - [Basics to Developing Bootloader for Arduino](https://www.electronicwings.com/arduino/basics-to-developing-bootloader-for-arduino)
+- [Optiboot Bootloader for Arduino and Atmel AVR](https://github.com/Optiboot/optiboot)
 - [A simple bootloader example for AVR microcontrollers (buggy!)](https://github.com/radhoo/AVR-bootloader)
 - [AVR Bootloader in C - eine einfache Anleitung](https://www.mikrocontroller.net/articles/AVR_Bootloader_in_C_-_eine_einfache_Anleitung)
 - [How To Write a Simple Bootloader For AVR In C language- (Part 35/46)](https://www.engineersgarage.com/how-to-write-a-simple-bootloader-for-avr-in-c-language-part-35-46/)
