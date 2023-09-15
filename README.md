@@ -10,6 +10,12 @@ To prepare your build environment first read this tutorial:
 
 **With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the code you want to upload in the bootloader itself.** 
 
+## Project specifications:
+
+- Compiler: **AVR-GCC**
+- MCU: **ATmega328P** (With 16MHz external crystal)
+- External Programmer: [**FT232H**](https://github.com/m3y54m/cjmcu-ft232hq-programmer) (You may use any other programmer supported by AVRDUDE)
+
 ## Looking Deeper at the Blinky Program
 
 ```c
