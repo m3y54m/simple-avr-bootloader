@@ -285,7 +285,7 @@ This is the contents of the output `.hex` file for the [`bootloader`](bootloader
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/5a172cae-d8e5-4d55-bdfd-b982f43de766)
 
-With this settings every time the microcontroller resets, it first executes the `bootloader`, the `bootloader` writes the `blinky_test` to address `0` of the flash memory and the executes `blinky_test` until next reset.
+With this settings every time the microcontroller resets, it first executes the `bootloader`, the `bootloader` writes the `blinky_test` to address `0` of the flash memory and it executes `blinky_test` until next reset.
 
 ## Resources
 
