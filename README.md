@@ -63,7 +63,7 @@ Convert `.bin` file to `.hex` file:
 avr-objcopy -I binary -O ihex build/program.bin build/program.hex
 ```
 
-This is the contents of th output `.hex` file for the [`blinky_test`](blinky_test) program:
+This is the contents of the output `.hex` file for the [`blinky_test`](blinky_test) program:
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43bb30ea-5cfd-4bab-9002-a3bfe7651469)
 
@@ -116,7 +116,7 @@ This means that the total size of the `blink_test` program is 162 bytes.
 
 ## Self Programming the Microcontroller Inside the Bootloader Program
 
-In the bootloader program we put the binary code of the [`blinky_test`](blinky_test) program in an array called `blinky_test_program_bin`.
+In the [`bootloader`](bootloader) program we put the binary code of the [`blinky_test`](blinky_test) program in an array called `blinky_test_program_bin`.
 
 At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting
 
@@ -233,7 +233,9 @@ int main(void)
 }
 ```
 
-Note that in order to configure the microcontroller to start running the bootloader program on RESET you should set `BOOTRST` fuse bit. Also in order to set the bootloader section size in flash memory large enough to ‌hold the bootloader program we should configure `BOOTSZ1` and `BOOTSZ0` fuse bits.
+Note that in order to configure the microcontroller to start running the bootloader program on RESET you should set `BOOTRST` fuse bit. Also in order to set the bootloader section size in flash memory large enough to ‌hold the bootloader program, we should configure `BOOTSZ1` and `BOOTSZ0` fuse bits.
+
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/42900b44-b6f0-4371-b181-afd68e7d34f4)
 
 First we compile the bootloader program. Then we can see size of compiled program using this command:
 
@@ -261,6 +263,11 @@ This means that the total size of the `bootloader` program is 614 bytes. As you 
 
 By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit out bootloader program (614 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
 
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/974ef4eb-b016-4100-91b5-719db5d217f1)
+
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43a6f9f8-abd5-4ee9-9da1-82fe69b287c5)
+
+
 ```
 avrdude -c ft232h -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
 ```
@@ -273,6 +280,10 @@ Adding `-Wl,-section-start=.text=0x7C00` flags to linker options of AVR-GCC make
 avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -o build/main.o -c src/main.c
 avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -Wl,-section-start=.text=0x7C00 -o build/program.elf build/main.o
 ```
+
+This is the contents of the output `.hex` file for the [`bootloader`](bootloader) program:
+
+![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/5a172cae-d8e5-4d55-bdfd-b982f43de766)
 
 With this settings every time the microcontroller resets, it first executes the `bootloader`, the `bootloader` writes the `blinky_test` to address `0` of the flash memory and the executes `blinky_test` until next reset.
 
