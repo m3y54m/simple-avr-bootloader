@@ -4,9 +4,11 @@ To prepare your build environment first read this tutorial:
 
 - [Getting started with AVR programming](https://github.com/m3y54m/start-avr)
 
-**⚠️ Disclaimer: By definition, a "bootloader" is a program written in a specific section of program memory on a microcontroller with the purpose of enabling the update of the main program using a communication peripheral, eliminating the need for an external programmer.**
+**⚠️ DISCALIMER ⚠️**
 
-**With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller.** 
+**By definition, a "bootloader" is a program written in a specific section of program memory on a microcontroller with the purpose of enabling the update of the main program using a communication peripheral, eliminating the need for an external programmer.**
+
+**With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the code you want to upload in the bootloader itself.** 
 
 ## Looking Deeper at the Blinky Program
 
