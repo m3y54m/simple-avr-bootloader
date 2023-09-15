@@ -1,4 +1,4 @@
-# Extremely Simple AVR (ATmega328) Bootloader Tutorial 
+# Simple AVR (ATmega328) Bootloader Tutorial 
 
 To prepare your build environment first read this tutorial:
 
