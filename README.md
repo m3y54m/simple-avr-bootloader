@@ -129,12 +129,12 @@ This means that the total size of the `blink_test` program is 162 bytes.
 
 In the [`bootloader`](bootloader) program we put the binary code of the [`blinky_test`](blinky_test) program in an array called `blinky_test_program_bin`.
 
-At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting
+At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting.
 
-The function called `write_program_pages()` write the contents of the `blinky_test_program_bin` to address `0x0000`
+The function `write_program_pages()` writes the contents of the `blinky_test_program_bin` to the address `0x0000`
 of the flash memory of the microcontroller.
 
-Finally the program jumps to address `0x0000` of the flash memory and runs the `blinky_test` program and LED blinks faster continuously.
+Finally the program jumps to the address `0x0000` of the flash memory and runs the `blinky_test` program. Then LED blinks faster as long as microcontroller is not reset or powered off.
 
 ```c
 #define F_CPU 16000000UL
