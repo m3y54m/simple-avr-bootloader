@@ -8,7 +8,7 @@ To prepare your build environment first read this tutorial:
 
 **By definition, a "bootloader" is a program written in a specific section of program memory on a microcontroller with the purpose of enabling the update of the main program using a communication peripheral, eliminating the need for an external programmer.**
 
-**With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (`[`blinky_test`](blinky_test)`) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the [resources](#resources)**
+**With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload ([`blinky_test`](blinky_test)) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the [resources](#resources)**
 
 ## Project Specifications:
 
