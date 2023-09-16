@@ -244,6 +244,8 @@ int main(void)
 }
 ```
 
+## Fuse Bits Setting for Bootloader
+
 Note that in order to configure the microcontroller to start running the bootloader program on RESET you should set `BOOTRST` fuse bit. Also in order to set the bootloader section size in flash memory large enough to ‌hold the bootloader program, we should configure `BOOTSZ1` and `BOOTSZ0` fuse bits.
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/42900b44-b6f0-4371-b181-afd68e7d34f4)
