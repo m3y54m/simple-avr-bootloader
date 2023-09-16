@@ -274,12 +274,11 @@ Data:        162 bytes (7.9% Full)
 
 This means that the total size of the `bootloader` program is 614 bytes. As you may noted that 162 bytes is exactly the size of `blinky_test` program stored in an array inside the `bootloader` program.
 
-By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit out bootloader program (614 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
+By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit our bootloader program (614 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/974ef4eb-b016-4100-91b5-719db5d217f1)
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43a6f9f8-abd5-4ee9-9da1-82fe69b287c5)
-
 
 ```
 avrdude -c ft232h -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
