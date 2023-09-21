@@ -10,6 +10,14 @@ To prepare your build environment first read this tutorial:
 
 **With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky_test`**](blinky_test)**) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
 
+*DONE:*
+- Configure fuse bits settings for bootloader section size and reset vector
+- Write a hardcoded blinky program to address `0x0000` of the flash memory and execute it by the bootloader
+  
+*TODO:*
+- Start the bootloader operations only on external reset
+- Get the program binary through UART
+
 ## Project Specifications:
 
 - Compiler: **AVR-GCC**
