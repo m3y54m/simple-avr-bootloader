@@ -15,7 +15,6 @@ To prepare your build environment first read this tutorial:
 - Write a hardcoded blinky program to address `0x0000` of the flash memory and execute it by the bootloader
   
 *TODO:*
-- Start the bootloader operations only on external reset
 - Get the program binary through UART
 
 ## Project Specifications:
