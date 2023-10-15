@@ -6,9 +6,9 @@ To prepare your build environment first read this tutorial:
 
 **⚠️ DISCALIMER ⚠️**
 
-**By definition, a "bootloader" is a program written in a specific section of program memory on a microcontroller with the purpose of enabling the update of the main program using a communication peripheral, eliminating the need for an external programmer.**
+**A "bootloader" is a small program that resides in a dedicated section of the non-volatile memory of a computer. In microcontrollers it is mostly used to facilitate the updating of the main program by utilizing a communication peripheral, thereby eliminating the requirement for an external programmer. In more sophisticated computer systems, a bootloader is mostly employed to pre-configure the system clock and input/output interfaces.**
 
-**With this definition in mind, what follows is not a genuine bootloader. Instead, it is a tutorial designed to illustrate the process of program compilation and how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky_test`**](blinky_test)**) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
+**With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step illustrate the process of program compilation and configuration to show how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky_test`**](blinky_test)**) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
 
 *DONE:*
 - Configure fuse bits settings for bootloader section size and reset vector
