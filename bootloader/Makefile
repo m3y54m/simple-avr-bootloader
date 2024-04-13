@@ -1,6 +1,14 @@
 SRC_DIR = src
 BUILD_DIR = build
 
+# ft232h, is a common USB to serial converter that can be used as a programmer. 
+# You can this to match the programmer you're using. 
+#
+# Some other common programmers:
+#  - arduino
+#  - usbasp
+PROGRAMMER = usbasp # ft232h
+
 # The CC variable typically represents the C compiler that will be used during the
 # compilation process. By assigning avr-gcc to CC, it indicates that the avr-gcc
 # compiler is being used for compiling the C source files in the project.
@@ -94,17 +102,16 @@ disassemble: $(BUILD_DIR) hex_and_bin
 # configure fuse bits in order to enable BOOTRST and set size of bootloader section to 512 words = 1024 bytes.
 # bootloader start address (in words) = 0x3E00 => (in bytes) = 0x7C00 = 31744
 write_fusebits:
-	avrdude -c ft232h -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m 
+	avrdude -c $(PROGRAMMER) -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m 
 
 # upload the built program (hex file) to Atmega328P
 upload: hex_and_bin
-	avrdude -c ft232h -p m328p -U flash:w:$(BUILD_DIR)/program.hex
+	avrdude -c $(PROGRAMMER) -p m328p -U flash:w:$(BUILD_DIR)/program.hex
 # avrdude:
 # The command-line tool used for programming AVR microcontrollers.
 
-# -c ft232h:
-# Specifies the programmer type. In this case, it indicates that an FT232H board
-# is being used as the programmer. The specific programmer type may vary depending
+# -c $(PROGAMMER):
+# Specifies the programmer type. The specific programmer type may vary depending
 # on the hardware setup.
 
 # -p m328p:
