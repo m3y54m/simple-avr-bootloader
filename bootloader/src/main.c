@@ -14,6 +14,7 @@
 #include <util/delay.h>
 #include <avr/boot.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 
 // This array contains the binary code of the LED (on PB5) fast blinking program
 // program size: 162 bytes
@@ -33,54 +34,42 @@ uint8_t blinky_test_program_bin[] = {
     0x21, 0x50, 0x30, 0x40, 0x80, 0x40, 0xE1, 0xF7, 0x00, 0xC0, 0x00, 0x00,
     0xF3, 0xCF, 0xF8, 0x94, 0xFF, 0xCF};
 
-#define BLINKY_PROGRAM_SIZE_IN_BYTES sizeof(blinky_test_program_bin)
-#define BLINKY_PROGRAM_NUMBER_OF_PAGES ((BLINKY_PROGRAM_SIZE_IN_BYTES / SPM_PAGESIZE) + ((BLINKY_PROGRAM_SIZE_IN_BYTES % SPM_PAGESIZE == 0) ? 0 : 1))
+// address is where the program is to be inserted and ** must be page-aligned **
+// program_buffer_size needs to be a multiple of 2
+void write_program(const uint32_t address, uint8_t *program_buffer, const uint32_t program_buffer_size) {
+    // Disable interrupts.
+    uint8_t  sreg_last_state = SREG;
+    cli();
 
-void write_program_pages(uint32_t first_page_address, uint8_t *program_buffer)
-{
-  uint16_t b;
-  uint16_t p;
-  uint16_t current_page_size;
-  uint32_t current_page_address;
-  uint8_t sreg_last_state;
-
-  // Disable interrupts.
-  sreg_last_state = SREG;
-  cli();
-
-  eeprom_busy_wait();
-
-  for (p = 0; p < BLINKY_PROGRAM_NUMBER_OF_PAGES; p++)
-  {
-    // Calculate current page size in bytes
-    if (p == BLINKY_PROGRAM_NUMBER_OF_PAGES - 1)
+    eeprom_busy_wait();
+    
+    // iterate through the program_buffer one page at a time
+    for (uint32_t current_page_address = address; 
+         current_page_address <= (address + program_buffer_size); 
+         current_page_address += SPM_PAGESIZE) 
     {
-      // Last page size
-      current_page_size = BLINKY_PROGRAM_SIZE_IN_BYTES - SPM_PAGESIZE * (BLINKY_PROGRAM_NUMBER_OF_PAGES - 1);
+        boot_page_erase(current_page_address);
+        boot_spm_busy_wait(); // Wait until the memory is erased.
+
+        // iterate through the page, one word (two bytes) at a time
+        for (uint16_t b = 0; b < SPM_PAGESIZE; b += 2)
+        {
+          uint16_t w;
+          if ((current_page_address + b) < (address + program_buffer_size))
+          {
+          // Set up little-endian word
+            w = *program_buffer++;
+            w += (*program_buffer++) << 8;
+          } else {
+            w = 0xFFFF;
+          }
+
+          boot_page_fill(current_page_address + b, w);
+        }
+
+        boot_page_write(current_page_address); // Store buffer in flash page.
+        boot_spm_busy_wait();          // Wait until the memory is written.
     }
-    else
-    {
-      // Other page sizes
-      current_page_size = SPM_PAGESIZE;
-    }
-
-    current_page_address = first_page_address + p * SPM_PAGESIZE;
-
-    boot_page_erase(current_page_address);
-    boot_spm_busy_wait(); // Wait until the memory is erased.
-
-    for (b = 0; b < current_page_size; b += 2)
-    {
-      // Set up little-endian word
-      uint16_t w = *program_buffer++;
-      w += (*program_buffer++) << 8;
-
-      boot_page_fill(current_page_address + b, w);
-    }
-
-    boot_page_write(current_page_address); // Store buffer in flash page.
-    boot_spm_busy_wait();                  // Wait until the memory is written.
-  }
 
   // Re-enable RWW-section again. We need this if we want to jump back
   // to the application after bootloading.
@@ -95,17 +84,20 @@ int main(void)
   // Configure LED pin as output
   DDRB |= (1 << PB5);
 
-  // Blink LED 2 times slowly to show that the bootloader program is starting
-  for (uint8_t i = 0; i < 2; i++)
-  {
-    PORTB &= ~(1 << PB5); // Turn-off LED
-    _delay_ms(2000);
-    PORTB |= 1 << PB5; // Turn-on LED
-    _delay_ms(100);
-  }
+  // Check if a user program exists in flash memory
+  if (pgm_read_word(0) == 0xFFFF) {
+    // Blink LED 2 times slowly if writing the program to flash memory
+    for (uint8_t i = 0; i < 2; i++)
+    {
+      PORTB &= ~(1 << PB5); // Turn-off LED
+      _delay_ms(2000);
+      PORTB |= 1 << PB5; // Turn-on LED
+      _delay_ms(100);
+    }
 
-  // Write the binary code of the blinky program to flash memory at address 0x0000
-  write_program_pages(0x00000, blinky_test_program_bin);
+    // Write the binary code of the blinky program to flash memory at address 0x0000
+    write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
+  }
 
   // Jump to the start address of the blinky program (0x0000)
   asm("jmp 0");
