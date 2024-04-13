@@ -55,6 +55,10 @@ else
 	ifeq ($(shell uname | cut -d _ -f 1), MINGW64)
 		MK_DIR = mkdir -pv
 	endif
+
+	ifeq ($(shell uname), Darwin)
+		MK_DIR = mkdir -pv
+	endif
 endif
 
 all: hex_and_bin
