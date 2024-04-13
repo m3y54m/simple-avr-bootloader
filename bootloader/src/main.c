@@ -45,7 +45,7 @@ void write_program(const uint32_t address, uint8_t *program_buffer, const uint32
     
     // iterate through the program_buffer one page at a time
     for (uint32_t current_page_address = address; 
-         current_page_address <= (address + program_buffer_size); 
+         current_page_address < (address + program_buffer_size); 
          current_page_address += SPM_PAGESIZE) 
     {
         boot_page_erase(current_page_address);
