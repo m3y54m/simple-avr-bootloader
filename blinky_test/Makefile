@@ -1,6 +1,13 @@
 SRC_DIR = src
 BUILD_DIR = build
 
+# Select the programmer you are using with AVRDUDE to upload your program to the MCU
+# Some common programmers supported by AVRDUDE:
+#  - arduino
+#  - usbasp
+#  - ft232h
+PROGRAMMER = usbasp
+
 # The CC variable typically represents the C compiler that will be used during the
 # compilation process. By assigning avr-gcc to CC, it indicates that the avr-gcc
 # compiler is being used for compiling the C source files in the project.
@@ -35,23 +42,11 @@ CFLAGS = -Wall -Os -mmcu=atmega328p -std=gnu99
 
 # Define MK_DIR based on the operating system or environment in which the Makefile is being executed
 ifdef SystemRoot
+# for Windows
 	MK_DIR = mkdir
 else
-	ifeq ($(shell uname), Linux)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), CYGWIN)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), MINGW32)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), MINGW64)
-		MK_DIR = mkdir -pv
-	endif
+# for Linux, MacOS, and other OS
+	MK_DIR = mkdir -pv
 endif
 
 all: hex_and_bin
@@ -86,13 +81,12 @@ disassemble: $(BUILD_DIR) hex_and_bin
 
 # upload the built program (hex file) to Atmega328P
 upload: hex_and_bin
-	avrdude -c ft232h -p m328p -U flash:w:$(BUILD_DIR)/program.hex
+	avrdude -c $(PROGRAMMER) -p m328p -U flash:w:$(BUILD_DIR)/program.hex
 # avrdude:
 # The command-line tool used for programming AVR microcontrollers.
 
-# -c ft232h:
-# Specifies the programmer type. In this case, it indicates that an FT232H board
-# is being used as the programmer. The specific programmer type may vary depending
+# -c $(PROGRAMMER):
+# Specifies the programmer type. The specific programmer type may vary depending
 # on the hardware setup.
 
 # -p m328p:

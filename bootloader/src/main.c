@@ -16,8 +16,9 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
-// This array contains the binary code of the LED (on PB5) fast blinking program
-// program size: 162 bytes
+// This array contains the binary code for the `blinky_test` program
+// that blinks LED (on PB5) fast (with 5Hz frequency)
+// Program size: 162 bytes
 uint8_t blinky_test_program_bin[] = {
     0x0C, 0x94, 0x34, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
@@ -34,44 +35,65 @@ uint8_t blinky_test_program_bin[] = {
     0x21, 0x50, 0x30, 0x40, 0x80, 0x40, 0xE1, 0xF7, 0x00, 0xC0, 0x00, 0x00,
     0xF3, 0xCF, 0xF8, 0x94, 0xFF, 0xCF};
 
-// address is where the program is to be inserted and ** must be page-aligned **
-// program_buffer_size needs to be a multiple of 2
-void write_program(const uint32_t address, uint8_t *program_buffer, const uint32_t program_buffer_size) {
-    // Disable interrupts.
-    uint8_t  sreg_last_state = SREG;
-    cli();
+/**
+ * @brief Writes a program to a specified memory address.
 
-    eeprom_busy_wait();
-    
-    // iterate through the program_buffer one page at a time
-    for (uint32_t current_page_address = address; 
-         current_page_address < (address + program_buffer_size); 
-         current_page_address += SPM_PAGESIZE) 
+ * @param address The memory address to write the program to.
+ * This address must be PAGE-ALIGNED and valid for writing operations.
+
+ * @param program_buffer A pointer to a buffer containing the program to be written.
+
+ * @param program_buffer_size The size of the program buffer in bytes.
+ * This value specifies the amount of data to be written from the `program_buffer`.
+ * `program_buffer_size` needs to be a multiple of 2.
+
+ * @retval None.
+
+ * @details
+ * The `write_program` function writes the contents of the `program_buffer` to the specified memory address.
+ * It is typically used to write firmware or other executable code to embedded devices.
+
+ * @warning Writing to invalid memory locations can lead to system instability or crashes. Ensure that the `address` points to a valid memory region where writing is allowed.
+ */
+void write_program(const uint32_t address, const uint8_t *program_buffer, const uint32_t program_buffer_size)
+{
+  // Disable interrupts.
+  uint8_t sreg_last_state = SREG;
+  cli();
+
+  eeprom_busy_wait();
+
+  // iterate through the program_buffer one page at a time
+  for (uint32_t current_page_address = address;
+       current_page_address < (address + program_buffer_size);
+       current_page_address += SPM_PAGESIZE)
+  {
+    boot_page_erase(current_page_address);
+    boot_spm_busy_wait(); // Wait until the memory is erased.
+
+    // iterate through the page, one word (two bytes) at a time
+    for (uint16_t i = 0; i < SPM_PAGESIZE; i += 2)
     {
-        boot_page_erase(current_page_address);
-        boot_spm_busy_wait(); // Wait until the memory is erased.
+      uint16_t current_word = 0;
+      if ((current_page_address + i) < (address + program_buffer_size))
+      {
+        // Set up a little-endian word and point to the next word
+        current_word = *program_buffer++;
+        current_word |= (*program_buffer++) << 8;
+      }
+      else
+      {
+        current_word = 0xFFFF;
+      }
 
-        // iterate through the page, one word (two bytes) at a time
-        for (uint16_t b = 0; b < SPM_PAGESIZE; b += 2)
-        {
-          uint16_t w;
-          if ((current_page_address + b) < (address + program_buffer_size))
-          {
-          // Set up little-endian word
-            w = *program_buffer++;
-            w += (*program_buffer++) << 8;
-          } else {
-            w = 0xFFFF;
-          }
-
-          boot_page_fill(current_page_address + b, w);
-        }
-
-        boot_page_write(current_page_address); // Store buffer in flash page.
-        boot_spm_busy_wait();          // Wait until the memory is written.
+      boot_page_fill(current_page_address + i, current_word);
     }
 
-  // Re-enable RWW-section again. We need this if we want to jump back
+    boot_page_write(current_page_address); // Store buffer in a page of flash memory.
+    boot_spm_busy_wait();                  // Wait until the page is written.
+  }
+
+  // Re-enable RWW-section. We need this to be able to jump back
   // to the application after bootloading.
   boot_rww_enable();
 
@@ -85,21 +107,27 @@ int main(void)
   DDRB |= (1 << PB5);
 
   // Check if a user program exists in flash memory
-  if (pgm_read_word(0) == 0xFFFF) {
-    // Blink LED 2 times slowly if writing the program to flash memory
+  if (pgm_read_word(0) == 0xFFFF)
+  {
+    /**********************************************************/
+    // NOTE: This part of code is just to check if the MCU is
+    //       executing the bootloader or the user program.
+    //       You can remove it if you want.
     for (uint8_t i = 0; i < 2; i++)
     {
+      // Blink LED 2 times slowly
       PORTB &= ~(1 << PB5); // Turn-off LED
       _delay_ms(2000);
       PORTB |= 1 << PB5; // Turn-on LED
       _delay_ms(100);
     }
+    /**********************************************************/
 
-    // Write the binary code of the blinky program to flash memory at address 0x0000
+    // Write the binary code of the user program (`blinky_test`) to flash memory at address 0x0000
     write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
   }
 
-  // Jump to the start address of the blinky program (0x0000)
+  // Jump to the start address of the user program (0x0000)
   asm("jmp 0");
 
   // Bootloader ends here

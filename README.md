@@ -150,9 +150,11 @@ Finally the program jumps to the address `0x0000` of the flash memory and runs t
 #include <util/delay.h>
 #include <avr/boot.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 
-// This array contains the binary code of the LED (on PB5) fast blinking program
-// program size: 162 bytes
+// This array contains the binary code for the `blinky_test` program
+// that blinks LED (on PB5) fast (with 5Hz frequency)
+// Program size: 162 bytes
 uint8_t blinky_test_program_bin[] = {
     0x0C, 0x94, 0x34, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
@@ -169,56 +171,65 @@ uint8_t blinky_test_program_bin[] = {
     0x21, 0x50, 0x30, 0x40, 0x80, 0x40, 0xE1, 0xF7, 0x00, 0xC0, 0x00, 0x00,
     0xF3, 0xCF, 0xF8, 0x94, 0xFF, 0xCF};
 
-#define BLINKY_PROGRAM_SIZE_IN_BYTES sizeof(blinky_test_program_bin)
-#define BLINKY_PROGRAM_NUMBER_OF_PAGES ((BLINKY_PROGRAM_SIZE_IN_BYTES / SPM_PAGESIZE) + ((BLINKY_PROGRAM_SIZE_IN_BYTES % SPM_PAGESIZE == 0) ? 0 : 1))
+/**
+ * @brief Writes a program to a specified memory address.
 
-void write_program_pages(uint32_t first_page_address, uint8_t *program_buffer)
+ * @param address The memory address to write the program to.
+ * This address must be PAGE-ALIGNED and valid for writing operations.
+
+ * @param program_buffer A pointer to a buffer containing the program to be written.
+
+ * @param program_buffer_size The size of the program buffer in bytes.
+ * This value specifies the amount of data to be written from the `program_buffer`.
+ * `program_buffer_size` needs to be a multiple of 2.
+
+ * @retval None.
+
+ * @details
+ * The `write_program` function writes the contents of the `program_buffer` to the specified memory address.
+ * It is typically used to write firmware or other executable code to embedded devices.
+
+ * @warning Writing to invalid memory locations can lead to system instability or crashes. Ensure that the `address` points to a valid memory region where writing is allowed.
+ */
+void write_program(const uint32_t address, const uint8_t *program_buffer, const uint32_t program_buffer_size)
 {
-  uint16_t b;
-  uint16_t p;
-  uint16_t current_page_size;
-  uint32_t current_page_address;
-  uint8_t sreg_last_state;
-
   // Disable interrupts.
-  sreg_last_state = SREG;
+  uint8_t sreg_last_state = SREG;
   cli();
 
   eeprom_busy_wait();
 
-  for (p = 0; p < BLINKY_PROGRAM_NUMBER_OF_PAGES; p++)
+  // iterate through the program_buffer one page at a time
+  for (uint32_t current_page_address = address;
+       current_page_address < (address + program_buffer_size);
+       current_page_address += SPM_PAGESIZE)
   {
-    // Calculate current page size in bytes
-    if (p == BLINKY_PROGRAM_NUMBER_OF_PAGES - 1)
-    {
-      // Last page size
-      current_page_size = BLINKY_PROGRAM_SIZE_IN_BYTES - SPM_PAGESIZE * (BLINKY_PROGRAM_NUMBER_OF_PAGES - 1);
-    }
-    else
-    {
-      // Other page sizes
-      current_page_size = SPM_PAGESIZE;
-    }
-
-    current_page_address = first_page_address + p * SPM_PAGESIZE;
-
     boot_page_erase(current_page_address);
     boot_spm_busy_wait(); // Wait until the memory is erased.
 
-    for (b = 0; b < current_page_size; b += 2)
+    // iterate through the page, one word (two bytes) at a time
+    for (uint16_t i = 0; i < SPM_PAGESIZE; i += 2)
     {
-      // Set up little-endian word
-      uint16_t w = *program_buffer++;
-      w += (*program_buffer++) << 8;
+      uint16_t current_word = 0;
+      if ((current_page_address + i) < (address + program_buffer_size))
+      {
+        // Set up a little-endian word and point to the next word
+        current_word = *program_buffer++;
+        current_word |= (*program_buffer++) << 8;
+      }
+      else
+      {
+        current_word = 0xFFFF;
+      }
 
-      boot_page_fill(current_page_address + b, w);
+      boot_page_fill(current_page_address + i, current_word);
     }
 
-    boot_page_write(current_page_address); // Store buffer in flash page.
-    boot_spm_busy_wait();                  // Wait until the memory is written.
+    boot_page_write(current_page_address); // Store buffer in a page of flash memory.
+    boot_spm_busy_wait();                  // Wait until the page is written.
   }
 
-  // Re-enable RWW-section again. We need this if we want to jump back
+  // Re-enable RWW-section. We need this to be able to jump back
   // to the application after bootloading.
   boot_rww_enable();
 
@@ -231,23 +242,31 @@ int main(void)
   // Configure LED pin as output
   DDRB |= (1 << PB5);
 
-  // Blink LED 2 times slowly to show that the bootloader program is starting
-  for (uint8_t i = 0; i < 2; i++)
+  // Check if a user program exists in flash memory
+  if (pgm_read_word(0) == 0xFFFF)
   {
-    PORTB &= ~(1 << PB5); // Turn-off LED
-    _delay_ms(2000);
-    PORTB |= 1 << PB5; // Turn-on LED
-    _delay_ms(100);
+    /**********************************************************/
+    // NOTE: This part of code is just to check if the MCU is
+    //       executing the bootloader or the user program.
+    //       You can remove it if you want.
+    for (uint8_t i = 0; i < 2; i++)
+    {
+      // Blink LED 2 times slowly
+      PORTB &= ~(1 << PB5); // Turn-off LED
+      _delay_ms(2000);
+      PORTB |= 1 << PB5; // Turn-on LED
+      _delay_ms(100);
+    }
+    /**********************************************************/
+
+    // Write the binary code of the user program (`blinky_test`) to flash memory at address 0x0000
+    write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
   }
 
-  // Write the binary code of the blinky program to flash memory at address 0x0000
-  write_program_pages(0x00000, blinky_test_program_bin);
-
-  // Jump to the start address of the blinky program (0x0000)
+  // Jump to the start address of the user program (0x0000)
   asm("jmp 0");
 
   // Bootloader ends here
-}
 }
 ```
 
@@ -272,23 +291,23 @@ AVR Memory Usage
 ----------------
 Device: atmega328p
 
-Program:     614 bytes (1.9% Full)
+Program:     664 bytes (2.0% Full)
 (.text + .data + .bootloader)
 
 Data:        162 bytes (7.9% Full)
 (.data + .bss + .noinit)
 ```
 
-This means that the total size of the `bootloader` program is 614 bytes. As you may noted that 162 bytes is exactly the size of `blinky_test` program stored in an array inside the `bootloader` program.
+This means that the total size of the `bootloader` program is 664 bytes. As you may noted that 162 bytes is exactly the size of `blinky_test` program stored in an array inside the `bootloader` program.
 
-By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit our bootloader program (614 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
+By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit our bootloader program (664 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/974ef4eb-b016-4100-91b5-719db5d217f1)
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43a6f9f8-abd5-4ee9-9da1-82fe69b287c5)
 
 ```
-avrdude -c ft232h -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
+avrdude -c usbasp -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
 ```
 
 [Bootloader fuse bits setting in AVR® Fuse Calculator](https://www.engbedded.com/fusecalc/?P=ATmega328P&V_LOW=0xFF&V_HIGH=0xDC&V_EXTENDED=0xFD&O_HEX=Apply+values)

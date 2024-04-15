@@ -1,13 +1,12 @@
 SRC_DIR = src
 BUILD_DIR = build
 
-# ft232h, is a common USB to serial converter that can be used as a programmer. 
-# You can this to match the programmer you're using. 
-#
-# Some other common programmers:
+# Select the programmer you are using with AVRDUDE to upload your program to the MCU
+# Some common programmers supported by AVRDUDE:
 #  - arduino
 #  - usbasp
-PROGRAMMER = usbasp # ft232h
+#  - ft232h
+PROGRAMMER = usbasp
 
 # The CC variable typically represents the C compiler that will be used during the
 # compilation process. By assigning avr-gcc to CC, it indicates that the avr-gcc
@@ -46,27 +45,11 @@ LDFLAGS = -Wl,-section-start=.text=0x7C00
 
 # Define MK_DIR based on the operating system or environment in which the Makefile is being executed
 ifdef SystemRoot
+# for Windows
 	MK_DIR = mkdir
 else
-	ifeq ($(shell uname), Linux)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), CYGWIN)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), MINGW32)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname | cut -d _ -f 1), MINGW64)
-		MK_DIR = mkdir -pv
-	endif
-
-	ifeq ($(shell uname), Darwin)
-		MK_DIR = mkdir -pv
-	endif
+# for Linux, MacOS, and other OS
+	MK_DIR = mkdir -pv
 endif
 
 all: hex_and_bin
