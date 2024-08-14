@@ -21,7 +21,7 @@ To prepare your build environment first read this tutorial:
 
 - Compiler: **AVR-GCC**
 - MCU: **ATmega328P** (with 16MHz external crystal)
-- External Programmer: [**FT232H**](https://github.com/m3y54m/cjmcu-ft232hq-programmer) (you may use any other programmer supported by AVRDUDE)
+- External Programmer: **USBasp** (you may use any other programmer supported by AVRDUDE)
 
 ## Looking Deeper at the Blinky Program
 
@@ -138,7 +138,7 @@ In the [`bootloader`](bootloader) program we put the binary code of the [`blinky
 
 At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting.
 
-The function `write_program_pages()` writes the contents of the `blinky_test_program_bin` to the address `0x0000`
+The function `write_program()` writes the contents of the `blinky_test_program_bin` to the address `0x0000`
 of the flash memory of the microcontroller.
 
 Finally the program jumps to the address `0x0000` of the flash memory and runs the `blinky_test` program. Then LED blinks faster as long as microcontroller is not reset or powered off.
