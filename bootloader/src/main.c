@@ -1,14 +1,7 @@
-/* Connections
-
-      PB5 ---> LED
-*/
-
-#ifndef __AVR_ATmega328P__
-#define __AVR_ATmega328P__
-#endif
-
-// CPU main clock frequency in Hz
-#define F_CPU 16000000UL
+// Hardcoded bootloader for ATmega328P
+// Board connection:
+//   PB5 (Arduino Uno D13) ---> LED (with resistor)
+#define LED_PIN PB5
 
 #include <avr/io.h>
 #include <util/delay.h>
@@ -16,10 +9,10 @@
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
-// This array contains the binary code for the `blinky_test` program
+// This array contains the binary code for the `blinky` app
 // that blinks LED (on PB5) fast (with 5Hz frequency)
 // Program size: 162 bytes
-uint8_t blinky_test_program_bin[] = {
+uint8_t hardcoded_blinky_bin[] = {
     0x0C, 0x94, 0x34, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
@@ -104,7 +97,7 @@ void write_program(const uint32_t address, const uint8_t *program_buffer, const 
 int main(void)
 {
   // Configure LED pin as output
-  DDRB |= (1 << PB5);
+  DDRB |= (1 << LED_PIN);
 
   // Check if a user program exists in flash memory
   if (pgm_read_word(0) == 0xFFFF)
@@ -116,15 +109,15 @@ int main(void)
     for (uint8_t i = 0; i < 2; i++)
     {
       // Blink LED 2 times slowly
-      PORTB &= ~(1 << PB5); // Turn-off LED
+      PORTB &= ~(1 << LED_PIN); // Turn-off LED
       _delay_ms(2000);
-      PORTB |= 1 << PB5; // Turn-on LED
+      PORTB |= 1 << LED_PIN; // Turn-on LED
       _delay_ms(100);
     }
     /**********************************************************/
 
-    // Write the binary code of the user program (`blinky_test`) to flash memory at address 0x0000
-    write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
+    // Write the binary code of the user app (`blinky`) to flash memory at address 0x0000
+    write_program(0x00000, hardcoded_blinky_bin, sizeof(hardcoded_blinky_bin));
   }
 
   // Jump to the start address of the user program (0x0000)

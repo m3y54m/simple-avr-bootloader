@@ -140,11 +140,11 @@ This means that the total size of the `blink_test` program is 162 bytes.
 
 ## Self Programming the Microcontroller Inside the Bootloader Program
 
-In the [`bootloader`](bootloader) program we put the binary code of the [`blinky`](blinky) program in an array called `blinky_test_program_bin`.
+In the [`bootloader`](bootloader) program we put the binary code of the [`blinky`](blinky) program in an array called `hardcoded_blinky_bin`.
 
 At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting.
 
-The function `write_program()` writes the contents of the `blinky_test_program_bin` to the address `0x0000`
+The function `write_program()` writes the contents of the `hardcoded_blinky_bin` to the address `0x0000`
 of the flash memory of the microcontroller.
 
 Finally the program jumps to the address `0x0000` of the flash memory and runs the `blinky` program. Then LED blinks faster as long as microcontroller is not reset or powered off.
@@ -161,7 +161,7 @@ Finally the program jumps to the address `0x0000` of the flash memory and runs t
 // This array contains the binary code for the `blinky` program
 // that blinks LED (on PB5) fast (with 5Hz frequency)
 // Program size: 162 bytes
-uint8_t blinky_test_program_bin[] = {
+uint8_t hardcoded_blinky_bin[] = {
     0x0C, 0x94, 0x34, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
     0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00, 0x0C, 0x94, 0x3E, 0x00,
@@ -266,7 +266,7 @@ int main(void)
     /**********************************************************/
 
     // Write the binary code of the user program (`blinky`) to flash memory at address 0x0000
-    write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
+    write_program(0x00000, hardcoded_blinky_bin, sizeof(hardcoded_blinky_bin));
   }
 
   // Jump to the start address of the user program (0x0000)

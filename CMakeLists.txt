@@ -9,6 +9,7 @@ project("AVR Bootloader" C)
 
 # MCU and clock settings
 set(MCU atmega328p)
+# This definition is essential for libraries like <util/delay.h>
 set(F_CPU 16000000UL)
 
 # Programmer for avrdude
