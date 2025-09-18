@@ -1,0 +1,9 @@
+[
+  {
+    "name": "AVR-GCC",
+    "toolchainFile": "${workspaceFolder}/toolchain.cmake",
+    "preferredGenerator": {
+      "name": "MinGW Makefiles"
+    }
+  }
+]

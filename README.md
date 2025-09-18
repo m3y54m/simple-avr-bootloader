@@ -8,7 +8,7 @@ To prepare your build environment first read this tutorial:
 
 **A "bootloader" is a small program that is written to a dedicated section of the non-volatile memory of a computer. In microcontrollers it is mostly used to facilitate the updating of the main program by utilizing a communication peripheral, thereby eliminating the requirement for an external programmer. In more sophisticated computer systems, a bootloader is mostly employed to pre-configure the system clock and input/output interfaces.**
 
-**With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step illustrate the process of program compilation and configuration to show how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky_test`**](blinky_test)**) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
+**With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step illustrate the process of program compilation and configuration to show how a bootloader can self-program the microcontroller. This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky`**](blinky)**) in the bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
 
 *DONE:*
 - Configure fuse bits settings for bootloader section size and reset vector
@@ -49,10 +49,10 @@ int main(void)
 **Compile and link the program**
 
 ```
-cd blinky_test
+cd blinky
 mkdir build
-avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -o build/main.o -c src/main.c
-avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99  -o build/program.elf build/main.o
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c src/main.c
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11  -o build/program.elf build/main.o
 ```
 
 **Useful commands used to generate `.hex` and `.bin` files used for programming the microcontroller:**
@@ -81,7 +81,7 @@ Convert `.bin` file to `.hex` file:
 avr-objcopy -I binary -O ihex build/program.bin build/program.hex
 ```
 
-This is the contents of the output `.hex` file for the [`blinky_test`](blinky_test) program:
+This is the contents of the output `.hex` file for the [`blinky`](blinky) program:
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43bb30ea-5cfd-4bab-9002-a3bfe7651469)
 
@@ -89,7 +89,7 @@ This is the contents of the output `.hex` file for the [`blinky_test`](blinky_te
 - [Intel HEX File Format](https://microchipdeveloper.com/ipe:sqtp-hex-file-format)
 
 
-This is the contents of the output `.bin` file for the [`blinky_test`](blinky_test) program (shown in a Hex Viewer):
+This is the contents of the output `.bin` file for the [`blinky`](blinky) program (shown in a Hex Viewer):
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/3f6d5e52-2eb7-48e1-b77b-d7f25770e6fb)
 
@@ -134,14 +134,14 @@ This means that the total size of the `blink_test` program is 162 bytes.
 
 ## Self Programming the Microcontroller Inside the Bootloader Program
 
-In the [`bootloader`](bootloader) program we put the binary code of the [`blinky_test`](blinky_test) program in an array called `blinky_test_program_bin`.
+In the [`bootloader`](bootloader) program we put the binary code of the [`blinky`](blinky) program in an array called `blinky_test_program_bin`.
 
 At the begining of the program LED blinks 2 times slowly to show that the bootloader program is starting.
 
 The function `write_program()` writes the contents of the `blinky_test_program_bin` to the address `0x0000`
 of the flash memory of the microcontroller.
 
-Finally the program jumps to the address `0x0000` of the flash memory and runs the `blinky_test` program. Then LED blinks faster as long as microcontroller is not reset or powered off.
+Finally the program jumps to the address `0x0000` of the flash memory and runs the `blinky` program. Then LED blinks faster as long as microcontroller is not reset or powered off.
 
 ```c
 #define F_CPU 16000000UL
@@ -152,7 +152,7 @@ Finally the program jumps to the address `0x0000` of the flash memory and runs t
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
 
-// This array contains the binary code for the `blinky_test` program
+// This array contains the binary code for the `blinky` program
 // that blinks LED (on PB5) fast (with 5Hz frequency)
 // Program size: 162 bytes
 uint8_t blinky_test_program_bin[] = {
@@ -259,12 +259,12 @@ int main(void)
     }
     /**********************************************************/
 
-    // Write the binary code of the user program (`blinky_test`) to flash memory at address 0x0000
+    // Write the binary code of the user program (`blinky`) to flash memory at address 0x0000
     write_program(0x00000, blinky_test_program_bin, sizeof(blinky_test_program_bin));
   }
 
   // Jump to the start address of the user program (0x0000)
-  asm("jmp 0");
+  __asm__ __volatile__("jmp 0");
 
   // Bootloader ends here
 }
@@ -298,7 +298,7 @@ Data:        162 bytes (7.9% Full)
 (.data + .bss + .noinit)
 ```
 
-This means that the total size of the `bootloader` program is 664 bytes. As you may noted that 162 bytes is exactly the size of `blinky_test` program stored in an array inside the `bootloader` program.
+This means that the total size of the `bootloader` program is 664 bytes. As you may noted that 162 bytes is exactly the size of `blinky` program stored in an array inside the `bootloader` program.
 
 By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit our bootloader program (664 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
 
@@ -315,15 +315,15 @@ avrdude -c usbasp -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
 Adding `-Wl,-section-start=.text=0x7C00` flags to linker options of AVR-GCC makes start address of the bootloader program to be set on the start address of boot section.
 
 ```
-avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -o build/main.o -c src/main.c
-avr-gcc -Wall -Os -mmcu=atmega328p -std=gnu99 -Wl,-section-start=.text=0x7C00 -o build/program.elf build/main.o
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c src/main.c
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -Wl,-section-start=.text=0x7C00 -o build/program.elf build/main.o
 ```
 
 This is the contents of the output `.hex` file for the [`bootloader`](bootloader) program:
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/5a172cae-d8e5-4d55-bdfd-b982f43de766)
 
-With this settings every time the microcontroller resets, it first executes the `bootloader`, the `bootloader` writes the `blinky_test` to address `0` of the flash memory and it executes `blinky_test` until next reset.
+With this settings every time the microcontroller resets, it first executes the `bootloader`, the `bootloader` writes the `blinky` to address `0` of the flash memory and it executes `blinky` until next reset.
 
 ## Resources
 

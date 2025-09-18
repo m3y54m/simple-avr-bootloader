@@ -1,0 +1,47 @@
+name: Build binary and hex
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - name: Check out repository code
+      uses: actions/checkout@v4
+
+    # Install all necessary dependencies for the build
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-avr binutils-avr avr-libc cmake
+
+    # Configure and build the entire project in one go
+    - name: Configure and Build with CMake
+      run: |
+        cmake -S . -B build
+        cmake --build build
+
+    # Upload the blinky artifacts
+    - name: Upload blinky build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: blinky
+        path: |
+          build/blinky/blinky.bin
+          build/blinky/blinky.hex
+
+    # Upload the bootloader artifacts
+    - name: Upload bootloader build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: bootloader
+        path: |
+          build/bootloader/bootloader.bin
+          build/bootloader/bootloader.hex

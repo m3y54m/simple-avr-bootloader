@@ -128,7 +128,7 @@ int main(void)
   }
 
   // Jump to the start address of the user program (0x0000)
-  asm("jmp 0");
+  __asm__ __volatile__("jmp 0");
 
   // Bootloader ends here
 }
