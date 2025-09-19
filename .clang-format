@@ -1,11 +1,8 @@
-# This .clang-format file is tailored for C projects following widely accepted best practices.
-# It enforces readability, consistency, and compatibility with most open source C codebases.
 BasedOnStyle: LLVM
-Language: C
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-ColumnLimit: 80
+ColumnLimit: 120
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: InlineOnly

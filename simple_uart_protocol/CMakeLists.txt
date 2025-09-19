@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 project(${PROJECT_NAME} C)
 
-add_executable(${PROJECT_NAME}.elf src/main.c)
+add_executable(${PROJECT_NAME}.elf src/main.c src/sup.c)
 
 add_custom_target(
   ${PROJECT_NAME}_build ALL

@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 # Use the AVR toolchain file (set before project())
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/toolchain.cmake CACHE STRING "AVR toolchain file")
-project("AVR Bootloader" C)
+
+# Dynamically set project name from directory name
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+project(${PROJECT_NAME} C)
 
 # ---------------------------------------------------------------------------
 # Common configuration
@@ -14,6 +17,9 @@ set(MCU atmega328p)
 # This definition is essential for libraries like <util/delay.h>
 set(F_CPU 16000000UL)
 
+# UART Baud rate settings
+set(BAUD 9600)
+
 # Programmer for avrdude
 set(AVRDUDE_PROGRAMMER usbasp)
 
@@ -23,11 +29,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
 # Common compiler flags for AVR targets
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Os -mmcu=${MCU} -DF_CPU=${F_CPU}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -DBAUD=${BAUD}")
 
 # Add subprojects
 add_subdirectory(blinky)
 add_subdirectory(bootloader_hardcoded)
+add_subdirectory(simple_uart_protocol)
 
 # Clean all build files and directories
 add_custom_target(

@@ -5,16 +5,19 @@ To prepare your build environment first read this tutorial:
 - [Getting started with AVR programming](https://github.com/m3y54m/start-avr)
 
 > [!NOTE]
-> **A "bootloader" is a small program that is written to a dedicated section of the non-volatile memory of a computer.
+> A "bootloader" is a small program that is written to a dedicated section of the non-volatile memory of a computer.
 > In microcontrollers it is mostly used to facilitate the updating of the main program by utilizing a communication peripheral,
 > thereby eliminating the requirement for an external programmer. In more sophisticated computer systems, a bootloader is mostly
-> employed to pre-configure the system clock and input/output interfaces.**
+> employed to pre-configure the system clock and input/output interfaces.
 >
-> **With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step
+> With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step
 > illustrate the process of program compilation and configuration to show how a bootloader can self-program the microcontroller.
-> This bootloader is literally hardcoding the binary data of the program you want to upload (**[**`blinky`**](blinky)**) in the
+> This bootloader is literally hardcoding the binary data of the program you want to upload ([`blinky`](blinky)) in the
 > bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through
-> UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the** [**resources**](#resources).
+> UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the [resources](#resources).
+
+> [!CAUTION]
+> Please note that the code and materials provided in this repository are intended for **EDUCATIONAL** purposes only and is **NOT SAFE** to be used in production.
 
 *DONE:*
 - Configure fuse bits settings for bootloader section size and reset vector
