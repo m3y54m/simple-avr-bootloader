@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
-project(blinky C)
+
+# Dynamically set project name from directory name
+get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+project(${PROJECT_NAME} C)
 
 add_executable(${PROJECT_NAME}.elf src/main.c)
 

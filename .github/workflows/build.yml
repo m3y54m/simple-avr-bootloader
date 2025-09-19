@@ -43,5 +43,5 @@ jobs:
       with:
         name: bootloader
         path: |
-          build/bootloader/bootloader.bin
-          build/bootloader/bootloader.hex
+          build/bootloader_hardcoded/bootloader_hardcoded.bin
+          build/bootloader_hardcoded/bootloader_hardcoded.hex

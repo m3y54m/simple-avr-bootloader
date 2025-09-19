@@ -44,7 +44,6 @@ int main(void)
   while (1)
   {
     PORTB ^= (1 << PB5); // Toggle the LED
-
     _delay_ms(100); // Wait for 100 ms
   }
 
@@ -306,23 +305,23 @@ Data:        162 bytes (7.9% Full)
 
 This means that the total size of the `bootloader` program is 664 bytes. As you may noted that 162 bytes is exactly the size of `blinky` program stored in an array inside the `bootloader` program.
 
-By setting the boot section size of flash memory to 512 words (1024 bytes) we can fit our bootloader program (664 bytes) in it. With this configuration the start address of the boot section becomes `0x3E00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3E00 * 2 = 0x7C00`.
+By setting the boot section size of flash memory to 1024 words (2048 bytes) we can fit our bootloader program (664 bytes) in it. With this configuration the start address of the boot section becomes `0x3C00` (in words). By knowing that each word is equal to 2 bytes, the start address becomes `0x3C00 * 2 = 0x7800`.
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/974ef4eb-b016-4100-91b5-719db5d217f1)
 
 ![image](https://github.com/m3y54m/simple-avr-bootloader/assets/1549028/43a6f9f8-abd5-4ee9-9da1-82fe69b287c5)
 
 ```
-avrdude -c usbasp -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDC:m -U efuse:w:0xFD:m
+avrdude -c usbasp -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDA:m -U efuse:w:0xFD:m
 ```
 
-[Bootloader fuse bits setting in AVR® Fuse Calculator](https://www.engbedded.com/fusecalc/?P=ATmega328P&V_LOW=0xFF&V_HIGH=0xDC&V_EXTENDED=0xFD&O_HEX=Apply+values)
+[Bootloader fuse bits setting in AVR® Fuse Calculator](https://www.engbedded.com/fusecalc/?P=ATmega328P&V_LOW=0xFF&V_HIGH=0xDA&V_EXTENDED=0xFD&O_HEX=Apply+values)
 
-Adding `-Wl,-section-start=.text=0x7C00` flags to linker options of AVR-GCC makes start address of the bootloader program to be set on the start address of boot section.
+Adding `-Wl,-section-start=.text=0x7800` flags to linker options of AVR-GCC makes start address of the bootloader program to be set on the start address of boot section.
 
 ```
 avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c src/main.c
-avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -Wl,-section-start=.text=0x7C00 -o build/program.elf build/main.o
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -Wl,-section-start=.text=0x7800 -o build/program.elf build/main.o
 ```
 
 This is the contents of the output `.hex` file for the [`bootloader`](bootloader) program:

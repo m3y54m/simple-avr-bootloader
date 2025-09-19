@@ -1,16 +1,18 @@
-
-// Blinky for AVR (ATmega328P)
-// Board connection:
-//   PB5 (Arduino Uno D13) ---> LED (with resistor)
-#define LED_PIN PB5
+/**
+ * @brief Blinky application for the ATmega328P.
+ * @details This application blinks an LED connected to pin PB5
+ * (Arduino Uno D13) at a 5Hz frequency.
+ */
 
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>
 
+#define LED_PIN PB5
+
 int main(void)
 {
-    // Set LED pin as output
+    // Configure LED pin as output
     DDRB |= (1U << LED_PIN);
 
     while (1)
