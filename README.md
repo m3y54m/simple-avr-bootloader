@@ -59,7 +59,7 @@ int main(void)
 ```
 cd blinky
 mkdir build
-avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c src/main.c
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c main.c
 avr-gcc -Wall -Os -mmcu=atmega328p -std=c11  -o build/program.elf build/main.o
 ```
 
@@ -323,7 +323,7 @@ avrdude -c usbasp -p m328p -U lfuse:w:0xFF:m -U hfuse:w:0xDA:m -U efuse:w:0xFD:m
 Adding `-Wl,-section-start=.text=0x7800` flags to linker options of AVR-GCC makes start address of the bootloader program to be set on the start address of boot section.
 
 ```
-avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c src/main.c
+avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -o build/main.o -c main.c
 avr-gcc -Wall -Os -mmcu=atmega328p -std=c11 -Wl,-section-start=.text=0x7800 -o build/program.elf build/main.o
 ```
 

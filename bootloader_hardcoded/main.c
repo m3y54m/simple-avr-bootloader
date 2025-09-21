@@ -172,7 +172,7 @@ static bool write_to_flash(const uint32_t destination_address, const uint8_t* so
             // Fill word into page buffer
             boot_page_fill(page_addr + offset, word_data);
         }
-
+        
         // Write page to flash
         boot_page_write(page_addr);
         // Wait for the write operation to complete
@@ -262,8 +262,8 @@ int main(void)
             // Loading failed - infinite error blink
             while (true)
             {
-               //led_blink(FAILURE_BLINKS_COUNT, FAILURE_BLINK_DELAY_MS);
-               //_delay_ms(2000);
+                led_blink(FAILURE_BLINKS_COUNT, FAILURE_BLINK_DELAY_MS);
+                _delay_ms(2000);
             }
         }
     }

@@ -19,7 +19,7 @@
 /// SUP Protocol end-of-frame byte
 #define SUP_EOF 0xE9
 /// Maximum payload size (reasonable limit for embedded systems)
-#define SUP_MAX_PAYLOAD_SIZE 64
+#define SUP_MAX_PAYLOAD_SIZE 128
 
 /*
  * SUP protocol frame format (ASCII diagram)
@@ -49,18 +49,18 @@
  * SUP Frame IDs
  *
  * ACK:
- * +------+------+-------------------+
- * | ID   | SIZE |      PAYLOAD      |
- * +------+------+-------------------+
- * | 0x01 |  1   |     ACK'ed ID     |
- * +------+------+-------------------+
+ * +------+------+-----------------------------------+
+ * | ID   | SIZE |                PAYLOAD            |
+ * +------+------+------------+----------------------+
+ * | 0x01 | 1~2  |  ACK'ed ID |  Optional ACK Info   |
+ * +------+------+------------+----------------------+
  *
  * NACK:
- * +------+------+-------------------+
- * | ID   | SIZE |      PAYLOAD      |
- * +------+------+-------------------+
- * | 0x02 |  1   |    NACK'ed ID     |
- * +------+------+-------------------+
+ * +------+------+-----------------------------------+
+ * | ID   | SIZE |                PAYLOAD            |
+ * +------+------+------------+----------------------+
+ * | 0x02 | 1~2  | NACK'ed ID |  Optional NACK Info  |
+ * +------+------+------------+----------------------+
  *
  * DATA:
  * +------+------+-------------------+
@@ -70,12 +70,11 @@
  * +------+------+-------------------+
  *
  * CMD_FW_UPDATE:
- * +------+------+--------------------------+
- * |  ID  | SIZE |          PAYLOAD         |
- * +------+------+--------------------------+
- * |      |      |  Size of FW binary data  |
- * | 0x11 |  2   | (2 bytes, little-endian) |
- * +------+------+--------------------------+
+ * +------+------+-------------------+
+ * |  ID  | SIZE |      PAYLOAD      |
+ * +------+------+-------------------+
+ * | 0x11 |  0   |    No payload     |
+ * +------+------+-------------------+
  *
  */
 
@@ -87,6 +86,7 @@ enum
 
     /**
      * @brief Binary data chunk transfer
+     *
      * @details This frame ID is used to send a chunk of binary data
      * from the host to the MCU during a firmware update process.
      * The payload contains a portion of the binary data to be written
@@ -99,15 +99,28 @@ enum
     //---- Commands ----
 
     /**
-     * @brief Command to initiate binary transfer for firmware update
-     * @details This command is sent by the host to MCU to signal the start of a
-     * FW update. The payload data includes the total size of the
-     * binary to be transferred which is uint16_t (2 bytes, little-endian) which
-     * is enough for typical AVR applications.
-     * The MCU should respond with an ACK if it is ready to receive the binary
-     * data, or a NACK if it cannot accept the command.
-     * If it ACKs, the host can then proceed to send the binary data in chunks
-     * using DATA frames.
+     * @brief Command to initiate firmware update
+     *
+     * @details
+     * This command is issued by the host to tell the MCU that a
+     * firmware update sequence will begin. The exchange is a
+     * simple request/acknowledge/data flow optimized for small embedded
+     * systems (e.g. AVR).
+     *
+     * Transfer overview (host -> MCU):
+     *  1) Host -> MCU : CMD_FW_UPDATE
+     *  2) MCU  -> Host : ACK for CMD_FW_UPDATE
+     *  3) Host -> MCU : DATA frame containing total firmware size
+     *                   (2 bytes, uint16_t, little-endian)
+     *  4) MCU  -> Host : ACK for firmware size
+     *  5) Host -> MCU : DATA frames containing firmware payload chunks
+     *                   (each DATA frame is ACKed by the MCU)
+     *  6) Repeat step 5 until full firmware is transferred
+     *
+     * Note:
+     *  - The firmware size is transmitted as a 16-bit unsigned integer in
+     *    little-endian format. This is sufficient for typical AVR flash
+     *    sizes and keeps the protocol minimal.
      */
     SUP_ID_CMD_FW_UPDATE = 0x11,
 };
@@ -197,5 +210,28 @@ void sup_send_frame(const uint8_t id, const uint8_t* payload, const uint8_t payl
  * @param tx_byte Byte to send
  */
 void sup_send_byte(const uint8_t tx_byte);
+
+/**
+ * @brief Send acknowledgment frame (ACK) for a received frame ID
+ * @param ack_for_id Frame ID being acknowledged
+ * @param optional_byte Optional additional byte providing meta-information
+ *                      (e.g., status code). Can be NULL if not needed.
+ */
+void sup_send_ack(const uint8_t ack_for_id, const uint8_t* optional_byte);
+
+/**
+ * @brief Send negative acknowledgment frame (NACK) for a received frame ID
+ * @param nack_for_id Frame ID being negatively acknowledged
+ * @param optional_byte Optional additional byte providing meta-information
+ *                      (e.g., error code). Can be NULL if not needed.
+ */
+void sup_send_nack(const uint8_t nack_for_id, const uint8_t* optional_byte);
+
+/**
+ * @brief Send data frame
+ * @param payload Pointer to data payload
+ * @param payload_size Size of data payload in bytes
+ */
+void sup_send_data(const uint8_t* payload, const uint8_t payload_size);
 
 #endif // SUP_H

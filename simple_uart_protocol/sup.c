@@ -150,7 +150,7 @@ void sup_handle_rx_byte(const uint8_t byte)
 
 void sup_send_frame(const uint8_t id, const uint8_t* payload, const uint8_t payload_size)
 {
-    if (payload_size > SUP_MAX_PAYLOAD_SIZE)
+    if ((payload_size > SUP_MAX_PAYLOAD_SIZE) || (payload == NULL && payload_size != 0))
     {
         return;
     }
@@ -164,4 +164,23 @@ void sup_send_frame(const uint8_t id, const uint8_t* payload, const uint8_t payl
     }
     sup_send_byte(checksum);
     sup_send_byte(SUP_EOF);
+}
+
+void sup_send_ack(const uint8_t received_id, const uint8_t* optional_byte)
+{
+    const uint8_t payload[]    = {received_id, (*optional_byte)};
+    const uint8_t payload_size = (optional_byte != NULL) ? 2 : 1;
+    sup_send_frame(SUP_ID_ACK, payload, payload_size);
+}
+
+void sup_send_nack(const uint8_t received_id, const uint8_t* optional_byte)
+{
+    const uint8_t payload[]    = {received_id, (*optional_byte)};
+    const uint8_t payload_size = (optional_byte != NULL) ? 2 : 1;
+    sup_send_frame(SUP_ID_NACK, payload, payload_size);
+}
+
+void sup_send_data(const uint8_t* payload, const uint8_t payload_size)
+{
+    sup_send_frame(SUP_ID_DATA, payload, payload_size);
 }

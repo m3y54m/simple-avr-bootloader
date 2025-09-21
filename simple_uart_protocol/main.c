@@ -17,8 +17,8 @@
 #include <util/delay.h>
 #include <util/setbaud.h>
 
-// Global SUP frame reception state
-volatile bool is_sup_frame_received = false;
+/// Flag to indicate a new SUP frame has been received
+volatile bool is_new_frame_received = false;
 
 // Demo constants
 #define DEMO_LED_PIN PB5
@@ -42,7 +42,7 @@ ISR(USART_RX_vect)
     sup_rx_frame_state_t* sup_rx_frame_state = sup_get_rx_state();
     if (sup_rx_frame_state != NULL && sup_rx_frame_state->parsing_result == SUP_RESULT_SUCCESS)
     {
-        is_sup_frame_received = true;
+        is_new_frame_received = true;
     }
 }
 
@@ -141,9 +141,9 @@ int main(void)
 
     while (1)
     {
-        if (is_sup_frame_received)
+        if (is_new_frame_received)
         {
-            is_sup_frame_received = false;
+            is_new_frame_received = false;
 
             // Acknowledge the received message
             // you can receive this message in the Python demo script

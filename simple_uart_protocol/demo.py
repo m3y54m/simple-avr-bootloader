@@ -4,7 +4,7 @@ import time
 # SUP Protocol Constants
 SUP_SOF = 0xA1
 SUP_EOF = 0xE9
-SUP_MAX_PAYLOAD_SIZE = 64
+SUP_MAX_PAYLOAD_SIZE = 128
 
 # SUP Frame IDs
 SUP_ID_ACK = 0x01  # Acknowledgment for received frame

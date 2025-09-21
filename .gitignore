@@ -7,3 +7,6 @@ build/
 # ...but do NOT ignore the cmake-kits.json file and the parent folder
 !.vscode/
 !/.vscode/cmake-kits.json
+
+# Ignore Python cache files
+__pycache__/
