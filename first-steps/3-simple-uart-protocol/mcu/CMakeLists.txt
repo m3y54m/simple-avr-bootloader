@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-# Dynamically set project name from directory name
-get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-project(${PROJECT_NAME} C)
+project(3-simple-uart-protocol C)
 
 add_executable(${PROJECT_NAME}.elf main.c sup.c)
 

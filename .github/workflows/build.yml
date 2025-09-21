@@ -26,22 +26,45 @@ jobs:
     - name: Configure and Build with CMake
       run: |
         cmake -S . -B build
-        cmake --build build
+        cmake --build build --target 1-blinky_build
+        cmake --build build --target 2-hardcoded-bootloader_build
+        cmake --build build --target 3-simple-uart-protocol_build
+        cmake --build build --target firmware_build_all
 
-    # Upload the blinky artifacts
+    # Upload the blinky artifacts (first-steps)
     - name: Upload blinky build output
       uses: actions/upload-artifact@v4
       with:
-        name: blinky
+        name: 1-blinky
         path: |
-          build/blinky/blinky.bin
-          build/blinky/blinky.hex
+          build/first-steps/1-blinky/1-blinky.bin
+          build/first-steps/1-blinky/1-blinky.hex
 
-    # Upload the bootloader artifacts
-    - name: Upload bootloader build output
+    # Upload the hardcoded bootloader artifacts (first-steps)
+    - name: Upload hardcoded bootloader build output
       uses: actions/upload-artifact@v4
       with:
-        name: bootloader
+        name: 2-hardcoded-bootloader
         path: |
-          build/bootloader_hardcoded/bootloader_hardcoded.bin
-          build/bootloader_hardcoded/bootloader_hardcoded.hex
+          build/first-steps/2-hardcoded-bootloader/2-hardcoded-bootloader.bin
+          build/first-steps/2-hardcoded-bootloader/2-hardcoded-bootloader.hex
+
+    # Upload the simple UART protocol artifacts (first-steps)
+    - name: Upload simple UART protocol build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: 3-simple-uart-protocol
+        path: |
+          build/first-steps/3-simple-uart-protocol/mcu/3-simple-uart-protocol.bin
+          build/first-steps/3-simple-uart-protocol/mcu/3-simple-uart-protocol.hex
+
+    # Upload the consolidated firmware artifacts (bootloader + user app)
+    - name: Upload firmware build outputs
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: |
+          build/firmware/firmware_bootloader.bin
+          build/firmware/firmware_bootloader.hex
+          build/firmware/firmware_user-app.bin
+          build/firmware/firmware_user-app.hex

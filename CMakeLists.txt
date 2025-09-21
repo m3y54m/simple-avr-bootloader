@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 # Use the AVR toolchain file (set before project())
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/toolchain.cmake CACHE STRING "AVR toolchain file")
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/toolchain-avr.cmake CACHE STRING "AVR toolchain file")
 
 # Dynamically set project name from directory name
 get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -45,11 +45,11 @@ set(EFUSE 0xFD)
 # Common compiler flags for AVR targets
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -DBAUD=${BAUD} -DMAX_USER_APP_SIZE=${BOOTLOADER_START_ADDRESS}")
 
-# Add subprojects
-add_subdirectory(blinky)
-add_subdirectory(bootloader_hardcoded)
-add_subdirectory(simple_uart_protocol)
-add_subdirectory(final)
+# Add sub-projects
+add_subdirectory(first-steps/1-blinky)
+add_subdirectory(first-steps/2-hardcoded-bootloader)
+add_subdirectory(first-steps/3-simple-uart-protocol/mcu)
+add_subdirectory(firmware)
 
 # Clean all build files and directories
 add_custom_target(

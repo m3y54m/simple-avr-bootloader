@@ -1,30 +1,91 @@
 # Simple AVR (ATmega328) Bootloader Tutorial 
 
-To prepare your build environment first read this tutorial:
+If you are new to AVR programming stop here and first read this tutorial:
 
 - [Getting started with AVR programming](https://github.com/m3y54m/start-avr)
 
-> [!NOTE]
-> A "bootloader" is a small program that is written to a dedicated section of the non-volatile memory of a computer.
-> In microcontrollers it is mostly used to facilitate the updating of the main program by utilizing a communication peripheral,
-> thereby eliminating the requirement for an external programmer. In more sophisticated computer systems, a bootloader is mostly
-> employed to pre-configure the system clock and input/output interfaces.
->
-> With this definition in mind, what follows is not a practical bootloader. Instead, it is a tutorial designed to step-by-step
-> illustrate the process of program compilation and configuration to show how a bootloader can self-program the microcontroller.
-> This bootloader is literally hardcoding the binary data of the program you want to upload ([`blinky`](blinky)) in the
-> bootloader itself. With some small changes in code you can modify it to receive binary of the program you want to upload through
-> UART, I2C or SPI. To learn how to write a more sophisticated and secure bootloader study the [resources](#resources).
+## What is a Bootloader?
+
+A "bootloader" is a small program that is written to a dedicated section of the non-volatile memory of a computer.
+In microcontrollers it is mostly used to facilitate the updating of the main program by utilizing a communication peripheral,
+thereby eliminating the requirement for an external programmer. In more sophisticated computer systems, a bootloader is mostly
+employed to pre-configure the system clock and input/output interfaces.
 
 > [!CAUTION]
-> Please note that the code and materials provided in this repository are intended for **EDUCATIONAL** purposes only and is **NOT SAFE** to be used in production.
+> The code and materials in this repository are provided for **educational purposes only**. They are **not intended for production use** and may lack necessary safety, security, or efficiency features. Use at your own risk.
 
-*DONE:*
-- Configure fuse bits settings for bootloader section size and reset vector
-- Write a hardcoded blinky program to address `0x0000` of the flash memory and execute it by the bootloader
-  
-*TODO:*
-- Get the program binary through UART
+## Project Structure:
+
+```
+.
+├── .vscode
+│   └── cmake-kits.json
+├── CMakeLists.txt
+├── firmware
+│   ├── bootloader
+│   │   └── main.c
+│   ├── user-app
+│   │   └── main.c
+│   ├── boot_sync.h
+│   └── CMakeLists.txt
+├── firmware-upload-tool
+│   ├── blinky.bin
+│   ├── demo_sup.py
+│   ├── main.py
+│   └── sup.py
+├── first-steps
+│   ├── 1-blinky
+│   │   ├── CMakeLists.txt
+│   │   └── main.c
+│   ├── 2-hardcoded-bootloader
+│   │   ├── CMakeLists.txt
+│   │   └── main.c
+│   └── 3-simple-uart-protocol
+│       ├── mcu
+│       │   ├── CMakeLists.txt
+│       │   ├── main.c
+│       │   ├── sup.c
+│       │   └── sup.h
+│       └── pc
+│           └── main.py
+└── toolchain-avr.cmake
+```
+
+Below are the important files and folders at the repository root.
+
+- `.vscode/cmake-kits.json` — VS Code CMake kits configuration (helps the CMake extension find the AVR-GCC toolchain).
+- `CMakeLists.txt` — Main CMake project file (sets MCU, clock, programmer and other build options).
+- `toolchain-avr.cmake` — CMake toolchain file that configures the AVR cross-compiler and tools.
+- `firmware/` — Source for the bootloader and sample user application.
+- `firmware-upload-tool/` — Python-based tools for uploading firmware to the MCU.
+- `first-steps/` — Small example projects that introduce AVR development and this repository's concepts.
+
+
+`first-steps/`
+
+This folder contains guided, minimal examples to get started quickly:
+
+- `1-blinky/` — A basic "blinky" example (LED toggle).
+- `2-hardcoded-bootloader/` — A bootloader that contains a hardcoded application binary and demonstrates self-programming flash memory.
+- `3-simple-uart-protocol/` — Example for the Simple UART Protocol (SUP):
+  - `3-simple-uart-protocol/mcu/` — C code that runs on the AVR (SUP implementation).
+  - `3-simple-uart-protocol/pc/` — Python script to run on the host PC that speaks SUP to the MCU.
+
+
+`firmware/`
+
+- `firmware/bootloader/main.c` — Bootloader source. The bootloader is responsible for updating the main application firmware.
+- `firmware/user-app/main.c` — Sample user application that runs on the microcontroller.
+- `firmware/boot_sync.h` — Header that defines the shared memory/synchronization interface between the user app and the bootloader.
+- `firmware/CMakeLists.txt` — CMake file that builds both the bootloader and the user application.
+
+
+`firmware-upload-tool/`
+
+- `firmware-upload-tool/sup.py` — Python implementation of the Simple UART Protocol (SUP) used to communicate with the bootloader.
+- `firmware-upload-tool/main.py` — CLI/driver script that uses `sup.py` to upload firmware.
+- `firmware-upload-tool/demo_sup.py` — Demonstration script showing how to use `sup.py`.
+- `firmware-upload-tool/blinky.bin` — Pre-compiled blinky binary used for testing the upload process.
 
 ## Project Specifications:
 

@@ -95,7 +95,7 @@ def main():
     # Configure the serial port
     ser = serial.Serial(
         port="COM9",  # Change to your COM port (e.g., '/dev/ttyACM0' on Linux)
-        baudrate=9600,
+        baudrate=57600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
