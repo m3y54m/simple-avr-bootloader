@@ -152,9 +152,8 @@ This repository is designed as a step-by-step learning experience. Each example 
 ## Hardware and Software Requirements
 
 - **Compiler**: AVR-GCC toolchain
-- **Target MCU**: ATmega328P with 16MHz external crystal (Arduino Uno/Nano have this spec)
+- **Target MCU**: ATmega328P with 16MHz external crystal (Arduino Uno, Nano, or compatible ATmega328P board)
 - **Programmer**: USBasp (or any AVRDUDE-compatible programmer)
-- **Development Board**: Arduino Uno, Nano, or compatible ATmega328P board
 
 
 ## Getting Started: Understanding the Build Process
