@@ -489,7 +489,8 @@ The boot section is **write-protected** by default, making it much safer from ac
 
 ### Programming the Fuses
 
-> **⚠️ WARNING**: Incorrect fuse settings can brick your microcontroller! Double-check before programming.
+> [!WARNING]
+> Incorrect fuse settings can brick your microcontroller! Double-check before programming.
 
 **Check current fuse settings:**
 ```bash
