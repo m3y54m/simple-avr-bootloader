@@ -10,3 +10,8 @@ build/
 
 # Ignore Python cache files
 __pycache__/
+
+# Ignore the .clangd files
+.cache
+.clangd
+compile_commands.json

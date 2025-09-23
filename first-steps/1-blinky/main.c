@@ -46,7 +46,6 @@
 // ============================================================================
 
 #include <avr/io.h>        // AVR I/O port definitions
-#include <stdint.h>        // Standard integer types
 #include <util/delay.h>    // Delay functions (_delay_ms)
 
 // ============================================================================

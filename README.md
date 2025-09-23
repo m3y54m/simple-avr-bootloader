@@ -461,17 +461,6 @@ This demonstrates the complete bootloader cycle: detect missing firmware, instal
 
 To make our bootloader work, we need to configure the microcontroller's memory layout and tell it to start from the bootloader section instead of the normal application area.
 
-### Understanding AVR Memory Layout
-
-The ATmega328P flash memory can be divided into two sections:
-
-| Section | Address Range | Size | Purpose |
-|---------|---------------|------|---------|
-| **Application Section** | 0x0000 - 0x77FF | 30KB | Your main program |
-| **Boot Section** | 0x7800 - 0x7FFF | 2KB | Bootloader code |
-
-The boot section is **write-protected** by default, making it much safer from accidental corruption.
-
 ### Configuring Fuse Bits
 
 **Fuse bits** are special configuration bytes that control how the microcontroller behaves. For bootloader operation, we need to set:
@@ -488,6 +477,15 @@ Our bootloader is approximately 664 bytes, which requires a minimum boot section
 | BOOTSZ1 | BOOTSZ0 | Boot Section Size | Boot Start Address (in bytes) |
 |---------|---------|-------------------|-------------------|
 | 0       | 1       | 1024 words (2KB) | 0x7800 |
+
+After setting the fuse bits (which determine the boot section size via the BOOTSZ bits), the resulting memory layout for the ATmega328P flash memory (addresses shown in bytes) will be as follows:
+
+| Section | Address Range | Size | Purpose |
+|---------|---------------|------|---------|
+| **Application Section** | 0x0000 - 0x77FF | 30KB | Your main program |
+| **Boot Section** | 0x7800 - 0x7FFF | 2KB | Bootloader code |
+
+The boot section is **write-protected** by default, making it much safer from accidental corruption.
 
 ### Programming the Fuses
 

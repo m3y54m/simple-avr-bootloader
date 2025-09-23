@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.13)
 # Use the AVR toolchain file (set before project())
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/toolchain-avr.cmake CACHE STRING "AVR toolchain file")
 
+# Export compile commands for clangd/IntelliSense
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Dynamically set project name from directory name
 get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 project(${PROJECT_NAME} C)
