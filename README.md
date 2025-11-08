@@ -24,8 +24,8 @@ Imagine you've deployed hundreds of devices in the field and discover a bug in y
 AVR microcontrollers have a clever feature called **self-programming** - they can modify their own flash memory while running. Here's the magic:
 
 1. **Memory Layout**: Flash memory is divided into two sections:
-   - **Application Section** (0x0000 - (Boot reset vector -1)): Your main program lives here
-   - **Boot Section** (Boot reset vector - flash end address): The bootloader lives here (protected from accidental overwrites)
+   - **Application Section** (`0x0000` ~ `[Boot Reset Vector] - 1`): Your main program lives here
+   - **Boot Section** (`[Boot Reset Vector]` ~ `[Flash End Address]`): The bootloader lives here (protected from accidental overwrites)
 
 2. **Boot Process**: When the MCU resets, it can be configured (via fuse bits) to start from the bootloader section instead of address 0x0000.
 
