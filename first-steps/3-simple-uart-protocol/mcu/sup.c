@@ -119,19 +119,15 @@ void sup_handle_rx_byte(const uint8_t byte)
         return;
     }
 
-    // Always listen for a Start-Of-Frame byte, which can reset a broken frame transmission.
-    if (byte == SUP_SOF)
-    {
-        reset_rx_frame_state();
-        rx_frame_state->parsing_state = SUP_STATE_WAIT_ID;
-        return;
-    }
-
     switch (rx_frame_state->parsing_state)
     {
         case SUP_STATE_WAIT_SOF:
-            // This state is effectively handled by the check above,
-            // but we keep the case for clarity. Any byte other than SOF is ignored.
+            // Listen for a Start-Of-Frame byte. Any byte other than SOF is ignored.
+            if (byte == SUP_SOF)
+            {
+                reset_rx_frame_state();
+                rx_frame_state->parsing_state = SUP_STATE_WAIT_ID;
+            }
             break;
 
         case SUP_STATE_WAIT_ID:
