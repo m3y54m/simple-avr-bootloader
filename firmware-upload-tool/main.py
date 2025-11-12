@@ -6,7 +6,7 @@ binary. It uses the local `sup` module (same protocol as the MCU) to
 build and parse frames.
 
 Usage:
-    python loader.py --port COM9 --baud 57600 --file blinky.bin --trace
+    python main.py --port COM9 --baud 57600 --file blinky.bin --trace
 
 The script expects the bootloader on the MCU to reply with ACK frames
 for command and each data chunk. It will retry frames on timeout up to
