@@ -16,7 +16,7 @@ Think of it as the gatekeeper between power-on and your actual program. This sep
 
 ## Why Do We Need Bootloaders?
 
-Imagine you've deployed hundreds of devices in the field and discover a bug in your firmware. Without a bootloader, you'd need to physically retrieve each device and reprogram it with a dedicated programmer (like an ISP programmer). With a bootloader, you can update the firmware remotely over UART, SPI, I2C, or even wirelessly!
+Imagine you've deployed hundreds of devices in the field and discover a bug in your firmware. Without a bootloader, you'd need to physically retrieve each device and reprogram it with a dedicated programmer (like an ISP programmer). With a bootloader, you can update the firmware remotely over UART, SPI, I2C, USB, etc. or even wirelessly!
 
 
 ## How Does an AVR Bootloader Work?
